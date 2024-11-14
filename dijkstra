@@ -1,0 +1,75 @@
+#include <iostream>
+#include <climits>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+int choose(vector<int>& dist, vector<bool>& visited, int n) {
+    int minDist = INT_MAX, u = -1;
+    for (int i = 0; i < n; i++) {
+        if (!visited[i] && dist[i] < minDist) {
+            minDist = dist[i];
+            u = i;
+        }
+    }
+    return u;
+}
+
+void dijkstra(vector<vector<int>>& cost, int v, int n) {
+    vector<int> dist(n, INT_MAX);
+    vector<bool> visited(n, false);
+
+    dist[v] = 0;
+    visited[v] = true;
+
+    for (int count = 1; count < n; count++) {
+        int u = choose(dist, visited, n);
+        if (u == -1) break; // if no vertex is found, exit the loop
+        visited[u] = true;
+
+        for (int w = 0; w < n; w++) {
+            if (!visited[w] && cost[u][w] != INT_MAX && dist[u] != INT_MAX &&
+                dist[w] > dist[u] + cost[u][w]) {
+                dist[w] = dist[u] + cost[u][w];
+            }
+        }
+    }
+
+    cout << "Vertex\tDistance from Source" << endl;
+    for (int i = 0; i < n; i++) {
+        if (dist[i] == INT_MAX) {
+            cout << "V" << i << "\tINF" << endl;
+        } else {
+            cout << "V" << i << "\t" << dist[i] << endl;
+        }
+    }
+}
+
+int main() {
+    int n, v;
+    cout << "Enter the number of vertices: ";
+    cin >> n;
+
+    vector<vector<int>> cost(n, vector<int>(n));
+
+    cout << "Enter the cost matrix (use INF for infinity):\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            string input;
+            cin >> input;
+            if (input == "INF") {
+                cost[i][j] = INT_MAX;
+            } else {
+                cost[i][j] = stoi(input);
+            }
+        }
+    }
+
+    cout << "Enter the starting vertex: ";
+    cin >> v;
+
+    dijkstra(cost, v, n);
+
+    return 0;
+}
